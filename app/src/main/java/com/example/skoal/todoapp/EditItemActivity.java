@@ -9,16 +9,17 @@ import android.widget.EditText;
 public class EditItemActivity extends AppCompatActivity {
 
     EditText etEditText;
-    int index;
+    long index;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_item);
+
         etEditText = (EditText) findViewById(R.id.etEditText);
         String editItem = getIntent().getStringExtra("editItem");
         etEditText.setText(editItem);
-        index = getIntent().getIntExtra("index",0);
-
+        index = getIntent().getLongExtra("index",0);
+        //Toast.makeText(this, String.valueOf(index), Toast.LENGTH_LONG).show();
 
     }
 
@@ -29,6 +30,7 @@ public class EditItemActivity extends AppCompatActivity {
         data.putExtra("editItem", editedItem);
         data.putExtra("index", index);
         setResult(RESULT_OK, data);
+
         finish();
     }
 }

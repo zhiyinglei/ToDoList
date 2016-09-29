@@ -1,22 +1,23 @@
 package com.example.skoal.todoapp;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SimpleCursorAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
-import org.apache.commons.io.FileUtils;
-
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
+
+    DatabaseHelper myDb;
 
     ArrayList<String> todoItems;
     ArrayAdapter<String> aToDoAdapter;
@@ -29,16 +30,17 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        populateArrayItems();
+
+        myDb = new DatabaseHelper(this);
         lvItems = (ListView) findViewById(R.id.lvItems);
-        lvItems.setAdapter(aToDoAdapter);
+        populateListView();
+
         etEditText = (EditText) findViewById(R.id.etEditText);
         lvItems.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> adapterView, View view, int i, long l) {
-                todoItems.remove(i);
-                aToDoAdapter.notifyDataSetChanged();
-                writeItems();
+                myDb.delete(String.valueOf(l) );
+                populateListView();
                 return true;
             }
         });
@@ -46,59 +48,60 @@ public class MainActivity extends AppCompatActivity {
         lvItems.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                View curr = adapterView.getChildAt((int) i);
+                TextView c = (TextView) curr.findViewById(R.id.tv_taskName);
+
                 Intent intent = new Intent(MainActivity.this, EditItemActivity.class );
-                intent.putExtra("editItem", todoItems.get(i));
-                intent.putExtra("index", i);
+                intent.putExtra("editItem", c.getText().toString());
+                intent.putExtra("index", l);
                 startActivityForResult(intent, REQUEST_CODE);
+
             }
         });
 
 
     }
 
-    private void readItems(){
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try{
-            todoItems = new ArrayList<String>(FileUtils.readLines(file));
-        } catch (IOException e){
-            Log.e("err", e.toString());
-        }
+
+
+    public void populateListView(){
+        Cursor cursor = myDb.getAllData();
+        String[] fromFieldNames = new String[] {"TaskName"};
+        int[] toListViewIDs = new int[] {R.id.tv_taskName};
+        SimpleCursorAdapter myCursorAdapter;
+        myCursorAdapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,fromFieldNames,toListViewIDs,0);
+        lvItems.setAdapter(myCursorAdapter);
     }
 
-    private void writeItems(){
-        File filesDir = getFilesDir();
-        File file = new File(filesDir, "todo.txt");
-        try{
-            FileUtils.writeLines(file, todoItems);
-        } catch (IOException e){
-            Log.e("err", e.toString());
-        }
-    }
 
-    private void populateArrayItems(){
-        todoItems = new ArrayList();
-        readItems();
-        aToDoAdapter = new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1, todoItems);
-
-    }
 
     public void onAddItem(View view) {
-        aToDoAdapter.add(etEditText.getText().toString());
+
+        boolean isInserted = myDb.insertData(etEditText.getText().toString() );
+        if(isInserted == true) {
+            //Toast.makeText(MainActivity.this,"Data Inserted",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
+        }
+
         etEditText.setText("");
-        writeItems();
+        populateListView();
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
             String editedItem = data.getExtras().getString("editItem");
-            int index = data.getExtras().getInt("index", 0);
-            todoItems.set(index, editedItem);
-            aToDoAdapter.notifyDataSetChanged();
-            writeItems();
+            long index = data.getExtras().getLong("index", 0);
+            myDb.update(String.valueOf(index), editedItem );
+            populateListView();
 
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myDb.close();
+    }
 }
