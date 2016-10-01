@@ -1,12 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="horizontal">
+    >
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:id="@+id/tv_priority"
+        android:layout_toRightOf="@+id/tv_dueDate"
+        android:layout_below="@+id/tv_taskName"
+        android:layout_marginLeft="150dp"
+       />
+
+    <TextView
+        android:text="Due Date:"
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tvLabelTaskName"
+        android:id="@+id/tvLabelDueDate"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <TextView
+        android:text="Task: "
+        android:layout_width="65dp"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvLabelTaskName"
+
+        android:layout_alignParentTop="true"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <TextView
         android:id="@+id/tv_taskName"
-        android:layout_weight="0.22" />
-</LinearLayout>
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="t"
+        android:layout_toRightOf="@id/tvLabelTaskName" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_dueDate"
+        android:text="d"
+        android:layout_below="@id/tv_taskName"
+        android:layout_toRightOf="@id/tvLabelDueDate" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tv_status"
+        android:visibility="invisible" />
+
+</RelativeLayout>

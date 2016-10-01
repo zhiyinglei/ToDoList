@@ -11,7 +11,6 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -24,7 +23,8 @@ public class MainActivity extends AppCompatActivity {
     ListView lvItems;
     EditText etEditText;
 
-    private final int REQUEST_CODE = 20;
+    private final int REQUEST_CODE_UPDATE = 20;
+    private final int REQUEST_CODE_INSERT = 21;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,11 +50,19 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 View curr = adapterView.getChildAt((int) i);
                 TextView c = (TextView) curr.findViewById(R.id.tv_taskName);
+                TextView dueDate = (TextView) curr.findViewById(R.id.tv_dueDate);
+
+                String priority = ((TextView) curr.findViewById(R.id.tv_priority)).getText().toString();
+                String status = ((TextView) curr.findViewById(R.id.tv_status)).getText().toString();
 
                 Intent intent = new Intent(MainActivity.this, EditItemActivity.class );
                 intent.putExtra("editItem", c.getText().toString());
                 intent.putExtra("index", l);
-                startActivityForResult(intent, REQUEST_CODE);
+                intent.putExtra("dueDate", dueDate.getText().toString());
+                intent.putExtra("priority", priority);
+                intent.putExtra("status", status);
+                intent.putExtra("Action", REQUEST_CODE_UPDATE);
+                startActivityForResult(intent, REQUEST_CODE_UPDATE);
 
             }
         });
@@ -66,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
 
     public void populateListView(){
         Cursor cursor = myDb.getAllData();
-        String[] fromFieldNames = new String[] {"TaskName"};
-        int[] toListViewIDs = new int[] {R.id.tv_taskName};
+        String[] fromFieldNames = new String[] {"TaskName", "DueDate","Priority","Status"};
+        int[] toListViewIDs = new int[] {R.id.tv_taskName, R.id.tv_dueDate,R.id.tv_priority, R.id.tv_status};
         SimpleCursorAdapter myCursorAdapter;
         myCursorAdapter = new SimpleCursorAdapter(this, R.layout.item_layout,cursor,fromFieldNames,toListViewIDs,0);
         lvItems.setAdapter(myCursorAdapter);
@@ -75,33 +83,45 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-    public void onAddItem(View view) {
-
-        boolean isInserted = myDb.insertData(etEditText.getText().toString() );
-        if(isInserted == true) {
-            //Toast.makeText(MainActivity.this,"Data Inserted",Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(MainActivity.this, "Data not Inserted", Toast.LENGTH_LONG).show();
-        }
-
-        etEditText.setText("");
-        populateListView();
-    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE) {
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_UPDATE) {
             String editedItem = data.getExtras().getString("editItem");
             long index = data.getExtras().getLong("index", 0);
-            myDb.update(String.valueOf(index), editedItem );
-            populateListView();
+            String dueDate = data.getExtras().getString("dueDate");
+            String priority = data.getExtras().getString("priority");
+            String status = data.getExtras().getString("status");
+            myDb.update(String.valueOf(index), editedItem, dueDate,priority,status );
+
+
+
+//            Toast.makeText(MainActivity.this, dueDate, Toast.LENGTH_LONG).show();
 
         }
+
+        if (resultCode == RESULT_OK && requestCode == REQUEST_CODE_INSERT){
+            String editedItem = data.getExtras().getString("editItem");
+            //long index = data.getExtras().getLong("index", 0);
+            String dueDate = data.getExtras().getString("dueDate");
+            String priority = data.getExtras().getString("priority");
+            String status = data.getExtras().getString("status");
+            //Toast.makeText(MainActivity.this, status, Toast.LENGTH_LONG).show();
+            myDb.insertData(editedItem, dueDate, priority, status );
+        }
+
+        populateListView();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
         myDb.close();
+    }
+
+    public void onAddTask(View view) {
+        Intent intent = new Intent(MainActivity.this, EditItemActivity.class );
+        intent.putExtra("Action", REQUEST_CODE_INSERT);
+        startActivityForResult(intent, REQUEST_CODE_INSERT);
     }
 }

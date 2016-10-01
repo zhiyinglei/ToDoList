@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/activity_edit_item"
     android:layout_width="match_parent"
@@ -17,31 +18,85 @@
         android:layout_alignParentTop="true"
         android:layout_marginTop="11dp"
         android:id="@+id/tvTextView"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:textAppearance="@style/TextAppearance.AppCompat.Display1" />
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:layout_toStartOf="@+id/etEditText"
+        android:layout_toLeftOf="@+id/etEditText" />
+
+    <TextView
+        android:text="@string/tvDueDate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/etEditText"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="43dp"
+        android:id="@+id/tvDuedate"
+        android:textAppearance="@style/TextAppearance.AppCompat" />
+
+    <DatePicker
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/datePicker"
+        style="@android:style/Widget.DatePicker"
+        android:layout_marginLeft="17dp"
+        android:layout_marginStart="17dp"
+        android:layout_below="@+id/etEditText"
+        android:layout_toRightOf="@+id/btnEdit"
+        android:layout_toEndOf="@+id/btnEdit"
+        android:layout_marginTop="30dp" />
 
     <EditText
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:inputType="textMultiLine"
         android:ems="10"
-        android:layout_below="@+id/tvTextView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="37dp"
-        android:id="@+id/etEditText" />
+        android:id="@+id/etEditText"
+        android:layout_alignParentTop="true"
+        android:layout_alignRight="@+id/datePicker"
+        android:layout_alignEnd="@+id/datePicker" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/datePicker"
+        android:layout_toRightOf="@+id/tvPriority"
+        android:layout_marginLeft="40dp"
+        android:id="@+id/spPriority" />
 
     <Button
         android:text="@string/btnEdit"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="30dp"
         android:id="@+id/btnEdit"
         android:onClick="onSaveItem"
-        android:layout_below="@+id/etEditText"
+        android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:text="Priority:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvPriority"
+        android:layout_below="@+id/datePicker" />
+
+    <TextView
+        android:text="Status:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvPriority"
+        android:layout_marginTop="30dp"
+        android:id="@+id/tvStatus" />
+
+    <Spinner
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/tvStatus"
+        android:layout_below="@id/spPriority"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="25dp"
+        android:id="@+id/spStatus" />
+
 </RelativeLayout>
